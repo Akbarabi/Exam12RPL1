@@ -41,7 +41,6 @@ export const createTransaksi = async (req, res) => {
       include: {
         detail_transaksi: {
           include: {
-            id_menu: true, // Termasuk informasi tentang menu
             id_transaksi: true, // Termasuk informasi transaksi
           },
         },
