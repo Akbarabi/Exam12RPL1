@@ -17,27 +17,28 @@ enum Role {
   MANAGER
   ADMIN
   KASIR
-  User
+  USER
 }
 
 enum Jenis {
-  Makanan
-  Minuman
+  MAKANAN
+  MINUMAN
 }
 
 enum Status {
-  Belum_bayar
-  Lunas
+  BELUM_BAYAR
+  LUNAS
 }
 
 model User {
-  id        Int      @unique @default(autoincrement())
-  name      String
-  email     String   @unique
+  id        Int         @unique @default(autoincrement())
+  name      String      @unique
+  email     String      @unique
   password  String
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role        @default(USER)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  transaksi Transaksi[]
 }
 
 model Menu {
@@ -45,33 +46,37 @@ model Menu {
   name             String
   price            Decimal
   jenis            Jenis
-  deskripsi        String
-  gambar           String
+  description      String
+  image            String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  Detail_transaksi Detail_transaksi[]
+  detail_transaksi Detail_transaksi[]
 }
 
 model Meja {
-  id         Int @unique @default(autoincrement())
+  id         Int         @unique @default(autoincrement())
   nomor_meja Int
+  Transaksi  Transaksi[]
 }
 
 model Transaksi {
   id               Int                @unique @default(autoincrement())
   tanggal          DateTime
-  id_user          Int
-  id_meja          Int
+  userId           Int
+  mejaId           Int
   nama_pelanggan   String
   status           Status
-  Detail_transaksi Detail_transaksi[]
+  user_details     User               @relation(fields: [userId], references: [id])
+  meja_details     Meja               @relation(fields: [mejaId], references: [id])
+  detail_transaksi Detail_transaksi[]
 }
 
 model Detail_transaksi {
   id           Int       @unique @default(autoincrement())
+  jumlah       Int
   harga        Decimal
-  id_transaksi Transaksi @relation(fields: [transaksiId], references: [id])
-  id_menu      Menu      @relation(fields: [menuId], references: [id])
   transaksiId  Int
   menuId       Int
+  id_transaksi Transaksi @relation(fields: [transaksiId], references: [id])
+  id_menu      Menu      @relation(fields: [menuId], references: [id])
 }

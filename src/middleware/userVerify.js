@@ -1,10 +1,10 @@
 import Joi from "joi";
 
-const registerSchema = Joi.object({
+const postSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
-  role: Joi.string().valid("ADMIN", "KASIR", "MANAGER").insensitive().messages({
+  role: Joi.string().valid("USER", "ADMIN", "KASIR", "MANAGER").insensitive().messages({
     'any.only': 'Role not valid'
   }),
 });
@@ -30,7 +30,7 @@ const updateSchema = Joi.object({
 
 export const userRegister = (req, res, next) => {
   try {
-    const { error } = registerSchema.validate(req.body);
+    const { error } = postSchema.validate(req.body);
 
     if (error) {
       return res.status(400).json({
@@ -38,6 +38,8 @@ export const userRegister = (req, res, next) => {
         message: error.message,
       });
     }
+
+    next();
   } catch (error) {
     return res.status(500).json({
       status: false,
@@ -45,7 +47,6 @@ export const userRegister = (req, res, next) => {
       data: error.message,
     });
   }
-  next();
 };
 
 export const userLogin = (req, res, next) => {

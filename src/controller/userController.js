@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient} from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const saltRounds = 10;
 
-export const createUser = async (req, res) => {
+export const postUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -17,7 +17,7 @@ export const createUser = async (req, res) => {
         name: name,
         email: email,
         password: hashedPassword,
-        role: role.toUpperCase() || "ADMIN",
+        role: role.toUpperCase() || "USER",
       },
     });
 
@@ -26,11 +26,12 @@ export const createUser = async (req, res) => {
       message: `Success create an user`,
       data: admin,
     });
+
   } catch (error) {
     return res.status(500).json({
       status: false,
       message: `Error on : [User_POST]`,
-      data: error,
+      data: error.message,
     });
   }
 };
