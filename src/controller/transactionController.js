@@ -6,42 +6,40 @@ export const createTransaksi = async (req, res) => {
   try {
     const { tanggal, userId, mejaId, nama_pelanggan, status, detail_transaksi } = req.body;
 
-    // Buat transaksi
+    const transaksiData = {
+      tanggal: new Date().toISOString(),
+      userId,
+      mejaId,
+      nama_pelanggan,
+      status: status.toUpperCase() || "BELUM_BAYAR",
+      detail_transaksi: await Promise.all(
+        detail_transaksi.map(async (detail) => {
+          const menu = await prisma.menu.findUnique({
+            where: {
+              id: detail.menuId,
+            },
+          });
+
+          if (!menu) {
+            throw new Error(`Menu with ID ${detail.menuId} not found`);
+          }
+
+          return {
+            jumlah: detail.jumlah,
+            harga: menu.price * detail.jumlah,
+            menuId: detail.menuId,
+          };
+        })
+      ),
+    };
+
     const transaksi = await prisma.transaksi.create({
-      data: {
-        tanggal: new Date().toISOString(), // Menggunakan tanggal yang diberikan dalam format body JSON
-        userId,
-        mejaId,
-        nama_pelanggan,
-        status: status.toUpperCase() || "BELUM_BAYAR", // Status otomatis uppercase
-        detail_transaksi: {
-          create: await Promise.all(
-            detail_transaksi.map(async (detail) => {
-              // Cari menu berdasarkan menuId
-              const menu = await prisma.menu.findUnique({
-                where: {
-                  id: detail.menuId,
-                },
-              });
-
-              if (!menu) {
-                throw new Error(`Menu with ID ${detail.menuId} not found`);
-              }
-
-              // Kembalikan detail transaksi dengan jumlah dan harga
-              return {
-                jumlah: detail.jumlah,
-                harga: menu.price * detail.jumlah, // Menghitung total harga
-                menuId: detail.menuId,
-              };
-            })
-          ),
-        },
-      },
+      data: transaksiData,
       include: {
         detail_transaksi: {
           include: {
-            id_transaksi: true, // Termasuk informasi transaksi
+            id_transaksi: true,
+            menu: true,
           },
         },
       },
