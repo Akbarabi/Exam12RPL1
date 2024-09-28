@@ -23,31 +23,30 @@ To get started and run the project locally:
 1. Clone this repository:
    ```bash
    git clone https://github.com/Akbarabi/Exam12RPL1.git
-Navigate to the project directory:
+   ```
+2. Navigate to the project directory:
 
-bash
-Copy code
+```bash
 cd Exam12RPL1
-Install the necessary dependencies:
+```
 
-bash
-Copy code
+3. Install the necessary dependencies:
+
+```bash
 npm install
-Start the project:
+```
 
-bash
-Copy code
+4. Start the project:
+
+```bash
 npm start
+```
+
 The project will now be running locally, accessible in your browser at http://localhost:3000.
 
 ## 🌟 Key Features
-User Authentication: Implemented secure login and registration features.
-CRUD Operations: Manage data with Create, Read, Update, and Delete operations using Express and PostgreSQL.
-Responsive Design: Ensures a consistent user experience across devices.
+- **CRUD Operations:** Manage data with Create, Read, Update, and Delete operations using Express and Laragon(MySQL).
 API Integration: Integration with third-party APIs for extended functionality.
-
-## 📝 License
-This project is open-source and available under the MIT License.
 
 ## 🌍 Connect
 Feel free to explore the project and reach out for collaboration or discussion:
