@@ -47,9 +47,3 @@ The project will now be running locally, accessible in your browser at http://lo
 ## 🌟 Key Features
 - **CRUD Operations:** Manage data with Create, Read, Update, and Delete operations using Express and Laragon(MySQL).
 API Integration: Integration with third-party APIs for extended functionality.
-
-## 🌍 Connect
-Feel free to explore the project and reach out for collaboration or discussion:
-
-GitHub
-Email
