@@ -5,9 +5,19 @@ import * as transaksiVerify from "../middleware/transaksiVerify.js";
 
 const app = express();
 
-app.post("/create", [auth.adminTokenVerify, transaksiVerify.transaksiCreate], transaksi.createTransaksi);
-app.get("/", auth.adminTokenVerify, transaksi.getTransaction);
-app.delete("/delete/:id", auth.adminTokenVerify, transaksi.deleteTransaction);
-app.patch("/update/:id", [auth.adminTokenVerify, transaksiVerify.transaksiUpdate], transaksi.updateTransaction);
+app.post(
+  "/create",
+  [auth.verifyRole(["KASIR"])],
+  transaksiVerify.transaksiCreate,
+  transaksi.createTransaksi
+);
+app.get("/", [auth.verifyRole(["KASIR", "MANAGER"])], transaksi.getTransaction);
+app.get("/detail", transaksi.getDetailTransaction);
+app.delete("/delete/:id", transaksi.deleteTransaction);
+app.patch(
+  "/update/:id",
+  transaksiVerify.transaksiUpdate,
+  transaksi.updateTransaction
+);
 
-export default app; 
+export default app;

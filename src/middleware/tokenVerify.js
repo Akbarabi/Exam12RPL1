@@ -3,10 +3,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const tokenVerify = async (req, res, next, role) => {
-  try {
+export const verifyRole = (roles) => {
+  return (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
-
     if (!token) {
       return res.status(401).json({
         status: false,
@@ -22,34 +21,28 @@ const tokenVerify = async (req, res, next, role) => {
         });
       }
 
-      req.user = decoded;
-
-      if (req.user.role !== role) {
+      const { role } = decoded;
+      if (!roles.includes(role)) {
         return res.status(403).json({
           status: false,
-          message: `Forbidden: You do not have access`,
+          message: `Access Denied: You do not have permission to perform this action.`,
         });
       }
 
+      req.user = decoded;
       next();
     });
-  } catch (error) {
-    return res.status(500).json({
-      status: false,
-      message: `Error on : [Token_VERIFY]`,
-      data: error.message,
-    });
-  }
+  };
 };
 
-export const kasirTokenVerify = async (req, res, next) => {
-  tokenVerify(req, res, next, "KASIR");
-};
+// export const kasirTokenVerify = async (req, res, next) => {
+//   tokenVerify(req, res, next, "KASIR");
+// };
 
-export const adminTokenVerify = async (req, res, next) => {
-  tokenVerify(req, res, next, "ADMIN");
-};
+// export const adminTokenVerify = async (req, res, next) => {
+//   tokenVerify(req, res, next, "ADMIN");
+// };
 
-export const managerTokenVerify = async (req, res, next) => {
-  tokenVerify(req, res, next, "MANAGER");
-};
+// export const managerTokenVerify = async (req, res, next) => {
+//   tokenVerify(req, res, next, "MANAGER");
+// };

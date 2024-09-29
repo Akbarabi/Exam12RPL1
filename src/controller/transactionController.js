@@ -4,7 +4,14 @@ const prisma = new PrismaClient();
 
 export const createTransaksi = async (req, res) => {
   try {
-    const { tanggal, userId, mejaId, nama_pelanggan, status, detail_transaksi } = req.body;
+    const {
+      tanggal,
+      userId,
+      mejaId,
+      nama_pelanggan,
+      status,
+      detail_transaksi,
+    } = req.body;
 
     const transaksiData = {
       tanggal: new Date().toISOString(),
@@ -51,14 +58,22 @@ export const createTransaksi = async (req, res) => {
       data: transaksi,
     });
   } catch (error) {
-    console.error("Error creating transaksi:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
 export const getTransaction = async (req, res) => {
   try {
-    const transaksi = await prisma.transaksi.findMany();
+    const keyword = req.params.keyword;
+
+    const transaksi = await prisma.transaksi.findMany({
+      where: {
+        tanggal: { equals: keyword || "" },
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
 
     return res.status(200).json({
       status: true,

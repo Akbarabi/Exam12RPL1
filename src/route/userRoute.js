@@ -7,8 +7,8 @@ const app = express();
 
 app.post("/register",authVerify.userRegister, user.postUser);
 app.post("/login",authVerify.userLogin, user.loginUser)
-app.get("/",tokenVerify.adminTokenVerify, user.getUser,);
-app.delete("/delete/:id",tokenVerify.adminTokenVerify, user.deleteUser);
-app.patch("/update/:id", tokenVerify.adminTokenVerify, user.updateUser);
+app.get("/",tokenVerify.verifyRole(["ADMIN"]), user.getUser,);
+app.delete("/delete/:id",tokenVerify.verifyRole(["ADMIN"]), user.deleteUser);
+app.patch("/update/:id", tokenVerify.verifyRole(["ADMIN"]), user.updateUser);
 
 export default app

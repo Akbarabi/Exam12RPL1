@@ -4,9 +4,9 @@ import * as auth from "../middleware/tokenVerify.js";
 
 const app = express();
 
-app.post("/create", auth.adminTokenVerify, meja.postMeja);
-app.get("/", auth.adminTokenVerify, meja.getMeja);
-app.delete("/delete/:id", auth.adminTokenVerify, meja.deleteMeja);
-app.put("/update/:id", auth.adminTokenVerify, meja.updateMeja);
+app.post("/create", auth.verifyRole(["ADMIN"]), meja.postMeja);
+app.get("/", auth.verifyRole(["ADMIN"]), meja.getMeja);
+app.delete("/delete/:id", auth.verifyRole(["ADMIN"]), meja.deleteMeja);
+app.put("/update/:id", auth.verifyRole(["ADMIN"]), meja.updateMeja);
 
 export default app;

@@ -8,14 +8,14 @@ const app = express();
 
 app.post(
   "/create",
-  [auth.adminTokenVerify, upload.single("image"), menuVerify.menuCreate],
+  [auth.verifyRole(["ADMIN"]), menuVerify.menuCreate, upload.single("image")],
   menu.postMenu
 );
-app.get("/", auth.adminTokenVerify, menu.getMenu);
-app.delete("/delete/:id", auth.adminTokenVerify, menu.deleteMenu);
+app.get("/", auth.verifyRole(["ADMIN"]), menu.getMenu);
+app.delete("/delete/:id", auth.verifyRole(["ADMIN"]), menu.deleteMenu);
 app.patch(
   "/update/:id",
-  [auth.adminTokenVerify, menuVerify.menuUpdate, upload.single("image")],
+  [auth.verifyRole(["ADMIN"]), menuVerify.menuUpdate, upload.single("image")],
   menu.updateMenu
 );
 
