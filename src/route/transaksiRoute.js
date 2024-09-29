@@ -12,7 +12,6 @@ app.post(
   transaksi.createTransaksi
 );
 app.get("/", [auth.verifyRole(["KASIR", "MANAGER"])], transaksi.getTransaction);
-app.get("/detail", transaksi.getDetailTransaction);
 app.delete("/delete/:id", transaksi.deleteTransaction);
 app.patch(
   "/update/:id",
