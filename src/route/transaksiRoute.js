@@ -11,12 +11,14 @@ app.post(
   transaksiVerify.transaksiCreate,
   transaksi.createTransaksi
 );
-app.get("/", [auth.verifyRole(["KASIR", "MANAGER"])], transaksi.getTransaction);
+app.get("/", auth.verifyRole(["KASIR", "MANAGER"]), transaksi.getTransaction);
 app.delete("/delete/:id", transaksi.deleteTransaction);
 app.patch(
   "/update/:id",
   transaksiVerify.transaksiUpdate,
   transaksi.updateTransaction
 );
+
+app.get("/nota/:transaksiId",auth.verifyRole(["KASIR"]), transaksi.printNota);
 
 export default app;

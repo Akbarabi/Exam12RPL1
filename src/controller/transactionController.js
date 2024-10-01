@@ -1,17 +1,14 @@
 import { PrismaClient } from "@prisma/client";
+import dayjs from "dayjs";
+import fs from "fs-extra";
+import PDFDocument from "pdfkit";
 
 const prisma = new PrismaClient();
 
 export const createTransaksi = async (req, res) => {
   try {
-    const {
-      tanggal,
-      userId,
-      mejaId,
-      nama_pelanggan,
-      status,
-      detail_transaksi,
-    } = req.body;
+    const { userId, mejaId, nama_pelanggan, status, detail_transaksi } =
+      req.body;
 
     const transaksiData = {
       tanggal: new Date().toISOString(),
@@ -188,6 +185,93 @@ export const updateTransaction = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: `Error on : [Transaction_UPDATE]`,
+      data: error.message,
+    });
+  }
+};
+
+export const printNota = async (req, res) => {
+  try {
+    const { transaksiId } = req.params;
+
+    const transaksi = await prisma.transaksi.findUnique({
+      where: { id: Number(transaksiId) },
+      include: {
+        user_details: true, // Nama kasir
+        meja_details: true, // Nomor meja
+        detail_transaksi: {
+          include: {
+            id_menu: true, // Include nama dan harga menu
+          },
+        },
+      },
+    });
+
+    if (!transaksi) {
+      return res.status(404).json({
+        status: false,
+        message: "Transaksi tidak ditemukan",
+      });
+    }
+
+    // Hitung total harga transaksi
+    const totalHarga = transaksi.detail_transaksi.reduce((total, detail) => {
+      return total + Number(detail.harga);
+    }, 0);
+
+    // Format tanggal menggunakan dayjs
+    const tanggalFormatted = dayjs(transaksi.tanggal).format(
+      "DD MMMM YYYY, HH:mm"
+    );
+
+    const doc = new PDFDocument();
+
+    const filename = `nota-${transaksiId}.pdf`;
+    const filepath = `./saves/nota/${filename}`;
+
+    doc.pipe(fs.createWriteStream(filepath));
+
+    doc.fontSize(20).text("Cafe Kita", { align: "center" }).moveDown();
+
+    doc
+      .fontSize(12)
+      .text(`Tanggal: ${tanggalFormatted}`)
+      .text(`Nama Kasir: ${transaksi.user_details.name}`)
+      .text(`Nomor Meja: ${transaksi.meja_details.id}`)
+      .text(`Nama Pelanggan: ${transaksi.nama_pelanggan}`)
+      .moveDown();
+
+    doc.text("Pesanan:");
+    transaksi.detail_transaksi.forEach((detail) => {
+      doc.text(
+        `- ${detail.id_menu.name} x${detail.jumlah} = Rp ${Number(
+          detail.harga
+        ).toLocaleString()}`
+      );
+    });
+
+    doc
+      .moveDown()
+      .text(`Total Harga: Rp ${totalHarga.toLocaleString()}`, {
+        align: "right",
+      })
+      .moveDown()
+      .text(`Status Pembayaran: ${transaksi.status}`, { align: "center" })
+      .moveDown()
+      .text("Terima kasih telah berkunjung!", { align: "center" });
+
+    // Akhiri dokumen
+    doc.end();
+
+    return res.status(201).json({
+      status: true,
+      message: "Nota berhasil disimpan sebagai PDF",
+      filePath: filepath,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: `Error on : [printNota]`,
       data: error.message,
     });
   }
